@@ -1,0 +1,415 @@
+/* =====================================================
+   ÆTHERA — Premium Entertainment Platform
+   Monochrome · Cinematic · Glass · Apple-class UX
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif&display=swap');
+
+:root {
+  --ae-bg: #000000;
+  --ae-bg-elev: #08080a;
+  --ae-surface: rgba(255,255,255,0.04);
+  --ae-surface-2: rgba(255,255,255,0.07);
+  --ae-border: rgba(255,255,255,0.08);
+  --ae-border-strong: rgba(255,255,255,0.14);
+  --ae-text: #ffffff;
+  --ae-text-soft: rgba(255,255,255,0.72);
+  --ae-text-mute: rgba(255,255,255,0.45);
+  --ae-text-faint: rgba(255,255,255,0.28);
+  --ae-accent: #ffffff;
+  --ae-shadow-lg: 0 30px 80px -20px rgba(0,0,0,0.8), 0 8px 24px -8px rgba(0,0,0,0.6);
+  --ae-shadow-glass: 0 1px 0 rgba(255,255,255,0.06) inset, 0 24px 60px -20px rgba(0,0,0,0.7);
+  --ae-blur: saturate(160%) blur(28px);
+  --ae-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ae-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  background: var(--ae-bg) !important;
+  color: var(--ae-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  font-feature-settings: "ss01","cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.011em;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+input, p, h1, h2, h3, h4, span, strong { user-select: auto; }
+
+/* Subtle ambient gradient on body */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(255,255,255,0.05), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, rgba(255,255,255,0.035), transparent 60%);
+  z-index: 0;
+}
+
+/* ---------- Brand mark ---------- */
+.ae-brand {
+  font-family: 'Instrument Serif', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase;
+  font-size: 1.45rem !important;
+  color: var(--ae-text) !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+.ae-brand-mark {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Hide original Film logo (red film icon) in nav, replaced via JS */
+nav .text-red-600 { color: var(--ae-text) !important; }
+
+/* ---------- Splash / Intro override ---------- */
+.intro-overlay {
+  position: fixed; inset: 0;
+  background: #000 !important;
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  animation: aeIntroOut 2.6s var(--ae-ease) forwards;
+}
+.intro-overlay::before {
+  content: 'Æ';
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(6rem, 18vw, 14rem);
+  color: var(--ae-text);
+  opacity: 0;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 60px rgba(255,255,255,0.18), 0 0 120px rgba(255,255,255,0.08);
+  animation: aeMarkIn 2.4s var(--ae-ease-out) forwards;
+}
+.intro-overlay::after {
+  content: 'ÆTHERA';
+  position: absolute;
+  bottom: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.6em;
+  font-size: 0.7rem;
+  color: var(--ae-text-mute);
+  opacity: 0;
+  animation: aeWordIn 2.4s var(--ae-ease-out) 0.4s forwards;
+}
+/* Kill the original busy intro internals */
+.intro-overlay .intro-light-beam,
+.intro-overlay .intro-particles,
+.intro-overlay .intro-text-container { display: none !important; }
+
+@keyframes aeMarkIn {
+  0%   { opacity: 0; transform: scale(0.96); filter: blur(8px); }
+  40%  { opacity: 1; transform: scale(1);    filter: blur(0); }
+  80%  { opacity: 1; transform: scale(1.02); filter: blur(0); }
+  100% { opacity: 0; transform: scale(1.06); filter: blur(6px); }
+}
+@keyframes aeWordIn {
+  0%   { opacity: 0; transform: translate(-50%, 8px); }
+  35%  { opacity: 1; transform: translate(-50%, 0); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -4px); }
+}
+@keyframes aeIntroOut {
+  0%, 80% { opacity: 1; }
+  100%    { opacity: 0; visibility: hidden; }
+}
+
+/* ---------- Page enter ---------- */
+.min-h-screen { background: var(--ae-bg) !important; }
+.bg-zinc-950, .bg-zinc-900, .bg-zinc-900\/80, .bg-zinc-900\/90,
+.bg-zinc-950\/50, .bg-zinc-950\/80, .bg-black\/20, .bg-black\/60,
+.bg-zinc-800, .bg-zinc-800\/80 { background-color: transparent !important; }
+
+/* ---------- Navigation ---------- */
+nav.glass-nav, .glass-nav {
+  background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0)) !important;
+  backdrop-filter: var(--ae-blur);
+  border-bottom: 1px solid transparent;
+  transition: background 0.4s var(--ae-ease), backdrop-filter 0.4s var(--ae-ease), border-color 0.4s var(--ae-ease);
+}
+nav.glass-nav.ae-scrolled {
+  background: rgba(0,0,0,0.55) !important;
+  border-bottom-color: var(--ae-border);
+}
+
+/* Nav buttons — pill, glass, monochrome */
+nav button {
+  background: var(--ae-surface) !important;
+  border: 1px solid var(--ae-border) !important;
+  color: var(--ae-text) !important;
+  border-radius: 999px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em;
+  transition: background 0.25s var(--ae-ease), border-color 0.25s var(--ae-ease), transform 0.25s var(--ae-ease);
+  backdrop-filter: blur(20px);
+  box-shadow: none !important;
+}
+nav button:hover {
+  background: var(--ae-surface-2) !important;
+  border-color: var(--ae-border-strong) !important;
+}
+nav button .text-red-500, nav button .text-red-400 { color: var(--ae-text-soft) !important; }
+
+/* Browse dropdown */
+nav .border-zinc-800, nav .border-zinc-700 { border-color: var(--ae-border) !important; }
+nav .rounded-2xl {
+  background: rgba(10,10,12,0.85) !important;
+  backdrop-filter: var(--ae-blur);
+  border: 1px solid var(--ae-border) !important;
+  box-shadow: var(--ae-shadow-glass) !important;
+}
+nav .text-red-600 { color: var(--ae-text) !important; }
+
+/* Generic small buttons in dropdown */
+nav .rounded-2xl button,
+nav .rounded-2xl a {
+  background: transparent !important;
+  border-radius: 10px !important;
+  color: var(--ae-text-soft) !important;
+  border: 1px solid transparent !important;
+  text-transform: none !important;
+  letter-spacing: 0;
+}
+nav .rounded-2xl button:hover {
+  background: var(--ae-surface-2) !important;
+  color: var(--ae-text) !important;
+}
+
+/* ---------- Search input ---------- */
+input[type="text"], input[type="search"], input {
+  background: var(--ae-surface) !important;
+  border: 1px solid var(--ae-border) !important;
+  color: var(--ae-text) !important;
+  border-radius: 999px !important;
+  backdrop-filter: blur(20px);
+  transition: border-color 0.25s var(--ae-ease), background 0.25s var(--ae-ease);
+  font-weight: 400;
+}
+input::placeholder { color: var(--ae-text-faint) !important; font-weight: 400; }
+input:focus {
+  outline: none !important;
+  border-color: var(--ae-border-strong) !important;
+  background: var(--ae-surface-2) !important;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.04) !important;
+}
+
+/* ---------- Hero / titles ---------- */
+h1, h2, h3, h4 { letter-spacing: -0.025em; font-weight: 600; }
+h1 { font-weight: 500; }
+.font-\[\'Bebas_Neue\'\] { font-family: 'Instrument Serif', serif !important; letter-spacing: -0.02em !important; text-transform: none !important; }
+
+/* Section titles ("Trending Movies" etc.) */
+section h2, section h3, .max-w-7xl h2, .max-w-7xl h3 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ae-text);
+}
+.border-l-4.border-red-600 {
+  border-left: none !important;
+  padding-left: 0 !important;
+}
+
+/* Recolor red accents to monochrome */
+.text-red-600, .text-red-500, .text-red-400 { color: var(--ae-text) !important; }
+.bg-red-600, .bg-red-500 { background: var(--ae-text) !important; color: #000 !important; }
+.bg-red-900\/50 { background: var(--ae-surface-2) !important; }
+.border-red-600, .border-red-500, .border-red-500\/30 { border-color: var(--ae-border-strong) !important; }
+.ring-red-500, .ring-red-600 { --tw-ring-color: var(--ae-border-strong) !important; }
+.shadow-\[0_0_20px_rgba\(229\,9\,20\,0\.8\)\],
+.shadow-\[0_0_30px_rgba\(229\,9\,20\,0\.8\)\],
+.shadow-\[0_10px_30px_rgba\(229\,9\,20\,0\.2\)\],
+.shadow-\[0_0_80px_rgba\(229\,9\,20\,0\.15\)\],
+.shadow-\[0_20px_60px_rgba\(0\,0\,0\,0\.9\)\] { box-shadow: var(--ae-shadow-lg) !important; }
+
+/* ---------- Cards ---------- */
+.movie-card {
+  background: transparent !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+  border: 1px solid transparent !important;
+  transition: transform 0.5s var(--ae-ease), border-color 0.4s var(--ae-ease) !important;
+}
+.movie-card .bg-zinc-900 { background: transparent !important; }
+.movie-card img { transition: transform 0.6s var(--ae-ease), filter 0.5s var(--ae-ease); filter: saturate(1.05); }
+.movie-card:hover {
+  transform: translateY(-6px) !important;
+  z-index: 10;
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.8) !important;
+  border-color: var(--ae-border) !important;
+}
+.movie-card:hover img { transform: scale(1.04); }
+.movie-card .ring-1, .movie-card .ring-zinc-800 { --tw-ring-color: transparent !important; }
+
+.poster-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.85), transparent 70%) !important;
+}
+
+/* Play button circle on poster — monochrome glass */
+.movie-card .rounded-full.bg-red-600,
+.rounded-full.bg-red-600 {
+  background: rgba(255,255,255,0.95) !important;
+  color: #000 !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
+}
+.rounded-full.bg-red-600 svg { color: #000 !important; stroke: #000 !important; }
+
+/* Rating chip */
+.bg-black\/60.backdrop-blur-md {
+  background: rgba(0,0,0,0.55) !important;
+  border: 1px solid var(--ae-border) !important;
+  border-radius: 999px !important;
+}
+.text-yellow-500 { color: #f5d57a !important; }
+
+/* Card text */
+.movie-card .text-white { color: var(--ae-text) !important; font-weight: 500 !important; }
+.movie-card .text-zinc-500 { color: var(--ae-text-mute) !important; }
+
+/* TV/Movie pill on card */
+.bg-blue-900\/50.text-blue-400,
+.bg-red-900\/50.text-red-400 {
+  background: var(--ae-surface) !important;
+  color: var(--ae-text-soft) !important;
+  border: 1px solid var(--ae-border);
+  border-radius: 6px !important;
+  letter-spacing: 0.12em;
+  font-weight: 500 !important;
+}
+
+/* ---------- Panels (details, episodes, recommendations) ---------- */
+.rounded-3xl, .rounded-2xl {
+  border-radius: 22px !important;
+}
+.bg-zinc-900\/80.rounded-3xl,
+.bg-zinc-900\/80.rounded-2xl {
+  background: rgba(255,255,255,0.035) !important;
+  border: 1px solid var(--ae-border) !important;
+  backdrop-filter: var(--ae-blur);
+  box-shadow: var(--ae-shadow-glass) !important;
+}
+
+/* Genre chips */
+.bg-zinc-800.text-zinc-300 {
+  background: var(--ae-surface) !important;
+  color: var(--ae-text-soft) !important;
+  border: 1px solid var(--ae-border) !important;
+  border-radius: 999px !important;
+  text-transform: none !important;
+  letter-spacing: 0;
+  font-weight: 500 !important;
+}
+
+/* Cast cards */
+.bg-zinc-950\/50.rounded-lg {
+  background: var(--ae-surface) !important;
+  border: 1px solid var(--ae-border) !important;
+}
+
+/* Episode rows */
+[class*="cursor-pointer"][class*="transition-all"] {
+  border-radius: 18px !important;
+}
+.bg-zinc-950\/80, .bg-zinc-950\/50 {
+  background: var(--ae-surface) !important;
+}
+.bg-zinc-800.ring-2 {
+  background: var(--ae-surface-2) !important;
+  --tw-ring-color: var(--ae-border-strong) !important;
+}
+
+/* Season select */
+select {
+  background: var(--ae-surface) !important;
+  border: 1px solid var(--ae-border) !important;
+  color: var(--ae-text) !important;
+  border-radius: 14px !important;
+  font-weight: 500 !important;
+  backdrop-filter: blur(20px);
+}
+select:focus { border-color: var(--ae-border-strong) !important; outline: none !important; --tw-ring-color: transparent !important; }
+select option { background: #0a0a0c; color: var(--ae-text); }
+
+/* ---------- Player frame ---------- */
+iframe { border: 0 !important; }
+.bg-black.rounded-2xl {
+  border: 1px solid var(--ae-border) !important;
+  box-shadow: 0 40px 100px -30px rgba(0,0,0,0.9) !important;
+}
+
+/* ---------- Scrollbars ---------- */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ---------- Loading spinner — monochrome ---------- */
+.border-red-600 { border-color: rgba(255,255,255,0.2) !important; border-bottom-color: var(--ae-text) !important; }
+
+/* ---------- Misc text recolors ---------- */
+.text-zinc-300 { color: var(--ae-text-soft) !important; }
+.text-zinc-400 { color: var(--ae-text-mute) !important; }
+.text-zinc-500, .text-zinc-600 { color: var(--ae-text-faint) !important; }
+.text-green-500 { color: #9ae6b4 !important; }
+
+/* Back to top button */
+button[class*="fixed"][class*="bottom"] {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid var(--ae-border) !important;
+  color: var(--ae-text) !important;
+  backdrop-filter: blur(20px);
+}
+
+/* ---------- Smooth section fades ---------- */
+.max-w-7xl > * {
+  animation: aeRise 0.7s var(--ae-ease-out) both;
+}
+@keyframes aeRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Primary CTA (Watch Now style) ---------- */
+.bg-white.text-black, button.bg-white {
+  background: #fff !important;
+  color: #000 !important;
+  border-radius: 999px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  transition: transform 0.25s var(--ae-ease), background 0.25s var(--ae-ease);
+}
+.bg-white.text-black:hover { transform: translateY(-1px); background: #f2f2f2 !important; }
+
+/* ---------- Mobile bottom safe area + nav polish ---------- */
+@media (max-width: 768px) {
+  nav.glass-nav {
+    background: rgba(0,0,0,0.6) !important;
+    border-bottom: 1px solid var(--ae-border);
+  }
+}
+
+/* ---------- Hide the legacy banner red border accent ---------- */
+.border-red-500\/30 { border-color: var(--ae-border) !important; }
+
+/* Selection */
+::selection { background: rgba(255,255,255,0.18); color: #fff; }

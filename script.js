@@ -7,9 +7,9 @@
   'use strict';
 
   const BRAND_REPLACEMENTS = [
-    [/ALANFLIX/g, 'ÆTHERA'],
-    [/AlanFlix/g, 'Ætheraa'.replace('aa','a')], // 'Æthera'
-    [/alanflix/g, 'æthera'],
+    [/AETHERA/g, 'ÆTHERA'],
+    [/AETHERA/g, 'Ætheraa'.replace('aa','a')], // 'Æthera'
+    [/AETHERA/g, 'æthera'],
   ];
 
   // Replace text inside a single text node
@@ -37,7 +37,7 @@
     // Tag the nav brand wordmark for serif styling
     if (
       root.tagName === 'SPAN' &&
-      /ÆTHERA|ALANFLIX|Æthera|AlanFlix/.test(root.textContent || '') &&
+      /ÆTHERA|AETHERA|Æthera|Aethera/.test(root.textContent || '') &&
       root.children.length === 0
     ) {
       root.classList.add('ae-brand');
@@ -67,8 +67,8 @@
 
   // Update document.title after React mounts
   function rewriteTitle() {
-    if (/AlanFlix|ALANFLIX/.test(document.title)) {
-      document.title = document.title.replace(/AlanFlix|ALANFLIX/g, 'ÆTHERA');
+    if (/Aethera|AETHERA/.test(document.title)) {
+      document.title = document.title.replace(/Aethera|AETHERA/g, 'ÆTHERA');
     }
   }
 

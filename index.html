@@ -5,24 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#09090b">
     
-    <!-- iOS/Apple PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ÆTHERA">
     
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="favicon.png">
     <title>ÆTHERA</title>
     
-    <!-- Tailwind CSS -->
+    <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22AETHERA%22%2C%22short_name%22%3A%22AETHERA%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2309090b%22%2C%22theme_color%22%3A%22%2309090b%22%2C%22description%22%3A%22AETHERA%20Streaming%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDkwOTBiIi8%2BPHBvbHlnb24gcG9pbnRzPSI0MCwzMCA3MCw1MCA0MCw3MCIgZmlsbD0iI2U1MDkxNCIvPjwvc3ZnPg%3D%3D%22%2C%22sizes%22%3A%22192x192%20512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     
-    <!-- Babel for JSX compilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script>
       Babel.registerPreset('react-classic', {
@@ -69,16 +66,18 @@
 
       const mapTMDBItem = (item, defaultType = 'movie') => {
           const isAnime = item.original_language === 'ja' && ((item.genre_ids && item.genre_ids.includes(16)) || (item.genres && item.genres.some(g => g.id === 16)));
+          let itemType = item.media_type || defaultType;
+          if (itemType === 'tv') itemType = 'series';
+
           return {
               id: item.id, Title: item.title || item.name,
               Year: (item.release_date || item.first_air_date || 'N/A').substring(0, 4),
               Poster: item.poster_path ? `${TMDB_IMG_BASE}${item.poster_path}` : 'N/A',
-              Type: item.media_type || defaultType, imdbRating: item.vote_average ? item.vote_average.toFixed(1) : 'N/A',
+              Type: itemType, imdbRating: item.vote_average ? item.vote_average.toFixed(1) : 'N/A',
               Overview: item.overview || '', isAnime: isAnime
           };
       };
 
-      // КОМПОНЕНТ КАРУСЕЛИ (УМНЫЙ СКРОЛЛ КОЛЕСИКОМ)
       const CarouselContainer = ({ children, className }) => {
         const elRef = useRef();
         useEffect(() => {
@@ -129,8 +128,8 @@
         const searchContainerRef = useRef(null);
         
         // Data State
-        const [gridItems, setGridItems] = useState([]); // Unified infinite grid
-        const [homeData, setHomeData] = useState([]); // Trending carousels (only for Home)
+        const [gridItems, setGridItems] = useState([]); 
+        const [homeData, setHomeData] = useState([]); 
         
         // Pagination & Loading States
         const [page, setPage] = useState(1);
@@ -160,7 +159,6 @@
            try { const data = JSON.parse(localStorage.getItem('aethera_history')); return Array.isArray(data) ? data : []; } catch { return []; }
         });
 
-        // Anti-Redirect Protect
         useEffect(() => {
             const handleBeforeUnload = (e) => {
                 if (selectedMovie) { e.preventDefault(); e.returnValue = ''; return ''; }
@@ -169,7 +167,6 @@
             return () => window.removeEventListener('beforeunload', handleBeforeUnload);
         }, [selectedMovie]);
 
-        // Click Outside Search
         useEffect(() => {
             const handleClickOutside = (event) => {
                 if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
@@ -204,7 +201,6 @@
           window.history.pushState({}, '', url);
         };
 
-        // Fetch Data logic
         const fetchGridData = async (pageNum, tab, genre, q, typeToggle, isNew = false) => {
            setLoading(true); 
            if (isNew) { setGridItems([]); setError(null); }
@@ -262,7 +258,6 @@
         const fetchHomeCarousels = async () => {
           setLoadingHome(true);
           try {
-            // Безопасный fetch, чтобы сбой одного API не ронял всю страницу
             const safeFetch = (url) => fetch(url).then(r => r.json()).catch(() => ({ results: [] }));
             
             const [trendingMov, trendingTv, trendingAnime] = await Promise.all([
@@ -300,10 +295,11 @@
                setActiveTab(t); setActiveGenre(g); setQuery(''); setDebouncedQuery(''); setSelectedMovie(null); setIsEditingWatchlist(false);
                if (t === 'watchlist') {
                   setGridItems([]); setHasMore(false); setLoading(false);
+               } else if (t === 'home') {
+                  setGridItems([]); setHasMore(false); setLoading(false); setActiveGenre(null);
+                  if (homeData.length === 0) fetchHomeCarousels();
                } else {
-                  // ГРУЗИМ СЕТКУ ВСЕГДА, ДАЖЕ НА ГЛАВНОЙ!
                   fetchGridData(1, t, g, '', type, true);
-                  if (t === 'home' && !g && homeData.length === 0) fetchHomeCarousels();
                }
             }
           };
@@ -321,17 +317,19 @@
           if (!introFinished) return;
           if (debouncedQuery.trim()) {
              setActiveGenre(null); setSelectedMovie(null); setPage(1); setIsEditingWatchlist(false);
-             const searchTab = activeTab === 'watchlist' ? 'movie' : activeTab;
+             const searchTab = (activeTab === 'watchlist' || activeTab === 'home') ? 'movie' : activeTab;
              setActiveTab(searchTab);
              updateURL({ q: debouncedQuery, type: searchType, t: searchTab });
              fetchGridData(1, searchTab, null, debouncedQuery, searchType, true);
           } else if (debouncedQuery === '' && query === '' && !selectedMovie) {
-             updateURL(activeTab === 'home' && !activeGenre ? {} : { t: activeTab, g: activeGenre });
+             updateURL(activeTab === 'home' ? {} : { t: activeTab, g: activeGenre });
              if (activeTab === 'watchlist') {
                 setGridItems([]); setHasMore(false); setLoading(false);
+             } else if (activeTab === 'home') {
+                setGridItems([]); setHasMore(false); setLoading(false); setActiveGenre(null);
+                if (homeData.length === 0) fetchHomeCarousels();
              } else {
                 fetchGridData(1, activeTab, activeGenre, '', searchType, true);
-                if (activeTab === 'home' && homeData.length === 0) fetchHomeCarousels();
              }
           }
         }, [debouncedQuery, searchType]);
@@ -349,15 +347,16 @@
           return () => clearTimeout(timer);
         }, []);
 
-        // Actions
         const handleTabClick = (tab) => {
            setActiveTab(tab); setActiveGenre(null); setQuery(''); setDebouncedQuery(''); setSelectedMovie(null); setPage(1); setIsEditingWatchlist(false);
            updateURL(tab === 'home' ? {} : { t: tab });
            if (tab === 'watchlist') {
               setGridItems([]); setHasMore(false); setLoading(false);
+           } else if (tab === 'home') {
+              setGridItems([]); setHasMore(false); setLoading(false);
+              if (homeData.length === 0) fetchHomeCarousels();
            } else {
               fetchGridData(1, tab, null, '', searchType, true);
-              if (tab === 'home' && homeData.length === 0) fetchHomeCarousels();
            }
         };
 
@@ -367,7 +366,6 @@
            fetchGridData(1, activeTab, genre, '', searchType, true);
         };
 
-        // Watchlist Management
         const handleToggleSelectHistory = (movie) => {
             setSelectedHistoryItems(prev => prev.some(m => m.id === movie.id) ? prev.filter(m => m.id !== movie.id) : [...prev, movie]);
         };
@@ -383,12 +381,12 @@
         };
 
         const handleSelectAllHistory = () => {
-            if (selectedHistoryItems.length === watchedHistory.length) setSelectedHistoryItems([]); // Deselect all
-            else setSelectedHistoryItems([...watchedHistory]); // Select all
+            if (selectedHistoryItems.length === watchedHistory.length) setSelectedHistoryItems([]); 
+            else setSelectedHistoryItems([...watchedHistory]); 
         };
 
         const loadMoreData = useCallback(() => {
-           if (loading || !hasMore || activeTab === 'watchlist') return;
+           if (loading || !hasMore || activeTab === 'watchlist' || activeTab === 'home') return;
            const nextPage = page + 1;
            setPage(nextPage);
            fetchGridData(nextPage, activeTab, activeGenre, debouncedQuery, searchType, false);
@@ -456,7 +454,7 @@
         const closePlayer = () => {
           setSelectedMovie(null); setSelectedEpisodeData(null); setMovieDetails(null); setRecommendations([]);
           if (debouncedQuery) { updateURL({ q: debouncedQuery, type: searchType, t: activeTab }); } 
-          else if (activeTab === 'home' && !activeGenre) { updateURL({}); }
+          else if (activeTab === 'home') { updateURL({}); }
           else { updateURL({ t: activeTab, g: activeGenre }); }
         };
 
@@ -609,9 +607,13 @@
 
                     {(selectedMovie.Type !== 'series' || selectedEpisodeData) && (
                       <div className="mb-8">
-                        <div className="relative w-full bg-black rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(255,255,255,0.05)] ring-1 ring-zinc-800 min-h-[400px]" style={{ paddingTop: '56.25%' }}>
+                        {/* ========================================================
+                            ПЛЕЕР ИСПРАВЛЕН: УБРАНА ПОРТРЕТНАЯ ВЫСОТА НА МОБИЛЬНЫХ,
+                            ТЕПЕРЬ СТРОГИЙ aspect-video ЧТОБЫ КНОПКИ НЕ ЛЕЗЛИ ДРУГ НА ДРУГА
+                        ======================================================== */}
+                        <div className="relative w-full bg-black rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(255,255,255,0.05)] ring-1 ring-zinc-800 aspect-video">
                           <div className="absolute inset-0 flex items-center justify-center -z-10 bg-zinc-950">
-                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                             <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-white"></div>
                           </div>
                           <iframe 
                              key={selectedMovie.id + (selectedEpisodeData ? selectedEpisodeData.id : '')} 
@@ -830,7 +832,7 @@
                     )}
 
                     {/* HOME PAGE CAROUSELS */}
-                    {activeTab === 'home' && !activeGenre && !isSearching && (
+                    {activeTab === 'home' && !activeGenre && !isSearching && homeData.length > 0 && (
                         <div className="space-y-10 sm:space-y-14 mb-10 border-b border-zinc-900 pb-10">
                              
                              {/* Continue Watching */}
@@ -864,7 +866,7 @@
                              )}
 
                              {/* Trending Categories */}
-                             {homeData.length > 0 && homeData.map((category, idx) => (
+                             {homeData.map((category, idx) => (
                                category.movies?.length > 0 && (
                                  <div key={idx} className="w-full animate-in fade-in duration-700" style={{ animationDelay: `${idx * 150}ms` }}>
                                    <h3 className="text-xl sm:text-2xl font-black text-white mb-4 sm:mb-6 flex items-center gap-3 pl-2 sm:pl-4 border-l-4 border-white">{category.title}</h3>
